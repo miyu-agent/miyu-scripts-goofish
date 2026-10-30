@@ -1,6 +1,7 @@
 [package]
-version = "0.1.0"
+version = "0.1.1"
 name = { en = "Goofish", zh = "闲鱼" }
 summary = { en = "Search Goofish second-hand listings without login, and watch keywords for new ones", zh = "免登录搜闲鱼二手，也能盯住关键词看新上的" }
 author = "SHORiN-KiWATA"
 icon = "shopping-cart"
+logo = "logo.png"
