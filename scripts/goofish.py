@@ -24,9 +24,9 @@ search drives a headless Chromium and captures the page's own API responses.
 A watch (monitor-init) stores that captured request; monitor-query replays it
 byte for byte over urllib, which works for a while without a browser.
 
-Watches and their seen ids live in MIYU_SCRIPT_STATE_DIR (kept per account,
+Watches and their seen ids live in MIYU_STATE_DIR (kept per account,
 survives reboots); the browser session snapshot is a cache in
-MIYU_SCRIPT_CACHE_DIR. It writes nowhere else.
+MIYU_CACHE_DIR. It writes nowhere else.
 """
 import hashlib
 import json
@@ -65,11 +65,11 @@ class Fail(Exception):
 
 # ------------------------------------------------------------------ storage
 
-CACHE = os.environ.get("MIYU_SCRIPT_CACHE_DIR") or ""
+CACHE = os.environ.get("MIYU_CACHE_DIR") or ""
 
 
 def cache_dir():
-    """Where state lives. Without MIYU_SCRIPT_CACHE_DIR a throwaway temp dir: search works, watches don't."""
+    """Where state lives. Without MIYU_CACHE_DIR a throwaway temp dir: search works, watches don't."""
     global CACHE
     if not CACHE:
         CACHE = tempfile.mkdtemp(prefix="goofish-")
@@ -83,13 +83,13 @@ cache_dir.temporary = False
 
 def state_dir():
     """监控存在这里：按账号分开、重启还在。"""
-    return os.environ.get("MIYU_SCRIPT_STATE_DIR") or ""
+    return os.environ.get("MIYU_STATE_DIR") or ""
 
 
 def need_persistent_cache():
     if not state_dir():
-        raise Fail("没有状态目录（MIYU_SCRIPT_STATE_DIR 没设），监控存不下来",
-                   "在 Miyu 的会话里调用；手动跑时自己设 MIYU_SCRIPT_STATE_DIR")
+        raise Fail("没有状态目录（MIYU_STATE_DIR 没设），监控存不下来",
+                   "在 Miyu 的会话里调用；手动跑时自己设 MIYU_STATE_DIR")
 
 
 def write_json(path, data):
@@ -530,8 +530,8 @@ def do_doctor(args):
                     check("无头启动", True, f"起得来，{time.monotonic() - started:.1f} 秒")
                 except Fail as exc:
                     check("无头启动", False, exc.error)
-    cached = bool(os.environ.get("MIYU_SCRIPT_CACHE_DIR"))
-    check("缓存目录", True, cache_dir() if cached else "没设 MIYU_SCRIPT_CACHE_DIR：每次搜索都重开浏览器会话",
+    cached = bool(os.environ.get("MIYU_CACHE_DIR"))
+    check("缓存目录", True, cache_dir() if cached else "没设 MIYU_CACHE_DIR：每次搜索都重开浏览器会话",
           warn=not cached)
     if cached:
         session = read_json(session_path())
@@ -541,7 +541,7 @@ def do_doctor(args):
         else:
             check("浏览器会话", True, "还没有，第一次搜索后建")
     persistent = bool(state_dir())
-    check("状态目录", True, state_dir() if persistent else "没设 MIYU_SCRIPT_STATE_DIR：能搜，监控不可用",
+    check("状态目录", True, state_dir() if persistent else "没设 MIYU_STATE_DIR：能搜，监控不可用",
           warn=not persistent)
     if persistent:
         check("监控", True, f"{len(watches())} 个")

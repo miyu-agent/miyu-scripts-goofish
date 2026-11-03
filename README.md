@@ -29,8 +29,8 @@ python3 -m playwright install chromium  # 或者装系统的 Chromium / Chrome /
 
 ## 沙盒和存放
 
-- 监控存在 Miyu 给脚本的状态目录 `MIYU_SCRIPT_STATE_DIR`：按 Miyu 账号分开、重启还在。
-- 缓存目录 `MIYU_SCRIPT_CACHE_DIR` 放能丢的：浏览器会话快照（25 分钟内复用，少碰风控）、浏览器自己的配置目录（`browser-home/`）。脚本别处都不写。
+- 监控存在 Miyu 给脚本的状态目录 `MIYU_STATE_DIR`：按 Miyu 账号分开、重启还在。
+- 缓存目录 `MIYU_CACHE_DIR` 放能丢的：浏览器会话快照（25 分钟内复用，少碰风控）、浏览器自己的配置目录（`browser-home/`）。脚本别处都不写。
 - Miyu 的沙盒把 `~/.config/chromium`、`~/.config/google-chrome` 盖成空的只读目录，`/dev/shm` 也写不了；脚本给浏览器另设了 `XDG_CONFIG_HOME`、加了 `--disable-dev-shm-usage`，Linux 上加了 `--no-sandbox`（Chromium 自己的沙盒套不进 Miyu 的）。Linux 上 Landlock 和 bubblewrap 挂载两种都实测能跑。macOS、Windows 没实测。
 - 缓存目录在系统临时目录下，重启会清掉：会话快照没了只是下次重建，监控不受影响。
 
